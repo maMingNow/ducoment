@@ -9,3 +9,17 @@ cache表示文件系统的文件读写缓存使用字节数
 
 上面是缓存，就是读写后停留在里面的，因此应该是一个稳定值，会有固定时间被清理。
 但是如果上面的值不稳定，一直在变化，那就要看bi和bo，是不是也跟着涨，即正在产生磁盘/文件的读写，一旦读写了，就一定会被缓存，因此buff和cache也跟着涨了
+
+
+三、附加扩展知识---man free
+used   Used memory (calculated as total - free - buffers - cache)
+free   Unused memory (MemFree and SwapFree in /proc/meminfo)
+available
+              Estimation of how much memory is available for starting new applications, without swapping. Unlike the data provided by the cache or free fields, this field takes into  account  page
+              cache  and  also  that  not  all  reclaimable  memory slabs will be reclaimed due to items being in use (MemAvailable in /proc/meminfo, available on kernels 3.14, emulated on kernels
+              2.6.27+, otherwise the same as free)
+1.由这几个描述可以推到出，总内存被划分成三部分---未使用内存(free)、已使用内存(used)、缓存(buffers/cache)
+2.由于由于free和缓存是已知的，因此就可以计算出used
+3.也可以推论出 一开始所有的内存都是free，应用时候的时候、磁盘使用的时候都是从free中申请，因此追加到cache和used里面了。free越来越少了。
+4.available 表示一个推测值,即当一个新的应用来申请资源的时候，还能出多少内存可以用。
+不包含交换区间，这部分主要从free中获取、从缓存中可以获取的资源
